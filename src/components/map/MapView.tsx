@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { Loader } from '@googlemaps/js-api-loader'
 import { Post, CATEGORY_COLORS } from '@/types'
 
@@ -18,14 +18,21 @@ export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<google.maps.Marker[]>([])
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null)
+  const [mapError, setMapError] = useState<string | null>(null)
 
   const initMap = useCallback(async () => {
     if (!mapRef.current || mapInstanceRef.current) return
 
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!apiKey) {
+      setMapError('Google Maps APIキーが設定されていません')
+      return
+    }
+
     const loader = new Loader({
-      apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-      version: 'weekly',
-      libraries: ['places'],
+      apiKey,
+      version: 'quarterly',
+      libraries: [],
     })
 
     await loader.load()
@@ -61,7 +68,10 @@ export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps
   }, [userLat, userLng])
 
   useEffect(() => {
-    initMap()
+    initMap().catch((err) => {
+      console.error('Google Maps load error:', err)
+      setMapError('マップの読み込みに失敗しました')
+    })
   }, [initMap])
 
   useEffect(() => {
@@ -125,6 +135,21 @@ export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps
 
     mapInstanceRef.current.panTo({ lat: userLat, lng: userLng })
   }, [userLat, userLng])
+
+  if (mapError) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-500 gap-3">
+        <span className="text-4xl">🗺️</span>
+        <p className="text-sm font-medium">{mapError}</p>
+        <button
+          onClick={() => { setMapError(null); mapInstanceRef.current = null }}
+          className="px-4 py-2 bg-matsuri-red text-white rounded-full text-sm font-semibold"
+        >
+          再読み込み
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div ref={mapRef} className="w-full h-full" />
