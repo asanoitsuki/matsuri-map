@@ -30,7 +30,7 @@ export default function HomePage() {
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
   const [showList, setShowList] = useState(false)
   const { latitude, longitude, getCurrentPosition } = useGeolocation()
-  const { posts, loading } = usePosts(filters, latitude, longitude)
+  const { posts, loading, error } = usePosts(filters, latitude, longitude)
 
   // 起動時に即座に位置情報をリクエスト
   useEffect(() => {
@@ -71,6 +71,13 @@ export default function HomePage() {
                 userLng={longitude}
               />
             </div>
+
+            {/* DB取得エラー表示（デバッグ用） */}
+            {error && (
+              <div className="absolute top-32 left-3 right-3 z-20 bg-red-100 border border-red-300 rounded-2xl p-3 text-xs text-red-700">
+                DBエラー: {error}
+              </div>
+            )}
 
             <FilterBar
               filters={filters}
