@@ -100,23 +100,28 @@ export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps
     })
   }, [posts, onMarkerClick])
 
-  // ユーザー位置マーカー
+  // ユーザー位置マーカー（初回取得時は即座に中心移動）
+  const userMarkerRef = useRef<google.maps.Marker | null>(null)
   useEffect(() => {
     if (!mapInstanceRef.current || !userLat || !userLng) return
 
-    new google.maps.Marker({
-      position: { lat: userLat, lng: userLng },
-      map: mapInstanceRef.current,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#4285F4',
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 3,
-        scale: 8,
-      },
-      zIndex: 999,
-    })
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setPosition({ lat: userLat, lng: userLng })
+    } else {
+      userMarkerRef.current = new google.maps.Marker({
+        position: { lat: userLat, lng: userLng },
+        map: mapInstanceRef.current,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: '#4285F4',
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 3,
+          scale: 8,
+        },
+        zIndex: 999,
+      })
+    }
 
     mapInstanceRef.current.panTo({ lat: userLat, lng: userLng })
   }, [userLat, userLng])

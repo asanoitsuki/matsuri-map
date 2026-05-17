@@ -53,13 +53,23 @@ export function PostModal({ post, onClose }: PostModalProps) {
   const handleLike = async () => {
     if (!user) { toast.error('ログインが必要です'); return }
     if (isLiked) {
-      await supabase.from('likes').delete().match({ user_id: user.id, post_id: post!.id })
+      await Promise.all([
+        supabase.from('likes').delete().match({ user_id: user.id, post_id: post!.id }),
+        supabase.from('saves').delete().match({ user_id: user.id, post_id: post!.id }),
+      ])
       setIsLiked(false)
+      setIsSaved(false)
       setLikesCount(c => c - 1)
+      toast.success('お気に入りから削除しました')
     } else {
-      await supabase.from('likes').insert({ user_id: user.id, post_id: post!.id })
+      await Promise.all([
+        supabase.from('likes').insert({ user_id: user.id, post_id: post!.id }),
+        supabase.from('saves').insert({ user_id: user.id, post_id: post!.id }),
+      ])
       setIsLiked(true)
+      setIsSaved(true)
       setLikesCount(c => c + 1)
+      toast.success('お気に入りに追加しました ❤️')
     }
   }
 

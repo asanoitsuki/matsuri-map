@@ -17,7 +17,7 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 glass-effect border-t border-gray-100 safe-area-bottom">
+    <nav className="fixed bottom-2 left-2 right-2 z-40 glass-effect border border-gray-100 rounded-2xl shadow-lg" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="grid grid-cols-5 h-16">
         {navItems.map((item) => {
           const isActive = pathname === item.href

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { FilterBar } from '@/components/filter/FilterBar'
 import { PostModal } from '@/components/post/PostModal'
@@ -31,6 +31,11 @@ export default function HomePage() {
   const [showList, setShowList] = useState(false)
   const { latitude, longitude, getCurrentPosition } = useGeolocation()
   const { posts, loading } = usePosts(filters, latitude, longitude)
+
+  // 起動時に即座に位置情報をリクエスト
+  useEffect(() => {
+    getCurrentPosition()
+  }, [])
 
   const handleLocateMe = useCallback(() => {
     getCurrentPosition()
