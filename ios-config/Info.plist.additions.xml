@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  ============================================================
+  Xcode の Info.plist に追加するキー
+  App/App/Info.plist を開いて以下を <dict> 内に追加してください
+  ============================================================
+-->
+<plist version="1.0">
+<dict>
+  <!-- 位置情報の使用許可（必須） -->
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>周辺の祭り・イベントを検索するために現在地を使用します</string>
+
+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+  <string>周辺の祭り・イベントを検索するために現在地を使用します</string>
+
+  <!-- カメラ使用許可（画像アップロード） -->
+  <key>NSCameraUsageDescription</key>
+  <string>イベントの写真を撮影して投稿するためにカメラを使用します</string>
+
+  <!-- フォトライブラリ使用許可 -->
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>イベントの写真を選択して投稿するためにフォトライブラリを使用します</string>
+
+  <!-- App Transport Security（Google Maps等のHTTPS通信） -->
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <false/>
+    <key>NSExceptionDomains</key>
+    <dict>
+      <key>supabase.co</key>
+      <dict>
+        <key>NSExceptionAllowsInsecureHTTPLoads</key>
+        <false/>
+        <key>NSIncludesSubdomains</key>
+        <true/>
+      </dict>
+    </dict>
+  </dict>
+
+  <!-- UIの向き設定 -->
+  <key>UISupportedInterfaceOrientations</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+  </array>
+
+  <!-- ステータスバー -->
+  <key>UIStatusBarStyle</key>
+  <string>UIStatusBarStyleLightContent</string>
+  <key>UIViewControllerBasedStatusBarAppearance</key>
+  <false/>
+</dict>
+</plist>

@@ -1,0 +1,103 @@
+'use client'
+
+import { Calendar, Locate, SlidersHorizontal } from 'lucide-react'
+import { Category, FilterState, CATEGORY_LABELS, FilterPeriod } from '@/types'
+import { cn } from '@/lib/utils'
+
+interface FilterBarProps {
+  filters: FilterState
+  onChange: (filters: FilterState) => void
+  onLocateMe: () => void
+}
+
+const periods: { value: FilterPeriod; label: string }[] = [
+  { value: 'all', label: 'すべて' },
+  { value: 'today', label: '今日' },
+  { value: 'week', label: '今週' },
+]
+
+const categories: Category[] = ['matsuri', 'yatai', 'event', 'kitchen_car']
+
+const categoryColors: Record<Category, string> = {
+  matsuri: 'bg-red-500 text-white border-red-500',
+  yatai: 'bg-orange-400 text-white border-orange-400',
+  event: 'bg-blue-500 text-white border-blue-500',
+  kitchen_car: 'bg-green-600 text-white border-green-600',
+}
+
+export function FilterBar({ filters, onChange, onLocateMe }: FilterBarProps) {
+  const toggleCategory = (cat: Category) => {
+    const current = filters.categories
+    const next = current.includes(cat)
+      ? current.filter(c => c !== cat)
+      : [...current, cat]
+    onChange({ ...filters, categories: next })
+  }
+
+  const setPeriod = (period: FilterPeriod) => {
+    onChange({ ...filters, period })
+  }
+
+  return (
+    <div className="absolute top-2 left-0 right-0 z-10 px-3 space-y-2">
+      {/* 検索バー */}
+      <div className="glass-effect rounded-2xl shadow-md flex items-center gap-2 px-3 py-2.5">
+        <SlidersHorizontal size={16} className="text-gray-400 shrink-0" />
+        <input
+          type="search"
+          placeholder="祭り・場所を検索..."
+          value={filters.searchQuery}
+          onChange={e => onChange({ ...filters, searchQuery: e.target.value })}
+          className="flex-1 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
+        />
+        <button
+          onClick={onLocateMe}
+          className={cn(
+            'p-1.5 rounded-xl transition-colors',
+            filters.nearMe ? 'bg-matsuri-red text-white' : 'bg-gray-100 text-gray-500'
+          )}
+        >
+          <Locate size={15} />
+        </button>
+      </div>
+
+      {/* フィルターチップ */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        {/* 期間フィルター */}
+        {periods.map(p => (
+          <button
+            key={p.value}
+            onClick={() => setPeriod(p.value)}
+            className={cn(
+              'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border',
+              filters.period === p.value
+                ? 'bg-matsuri-dark text-white border-matsuri-dark shadow-sm'
+                : 'bg-white text-gray-600 border-gray-200 shadow-sm'
+            )}
+          >
+            {p.value !== 'all' && <Calendar size={11} />}
+            {p.label}
+          </button>
+        ))}
+
+        <div className="w-px bg-gray-200 mx-1" />
+
+        {/* カテゴリフィルター */}
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => toggleCategory(cat)}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border shadow-sm',
+              filters.categories.includes(cat)
+                ? categoryColors[cat]
+                : 'bg-white text-gray-600 border-gray-200'
+            )}
+          >
+            {CATEGORY_LABELS[cat]}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
