@@ -22,60 +22,13 @@ function isValidCoord(lat: number, lng: number): boolean {
   )
 }
 
+let loaderInstance: Loader | null = null
+
 export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<google.maps.Marker[]>([])
-  const idleListenerRef = useRef<google.maps.MapsEventListener | null>(null)
-  const postsRef = useRef<Post[]>(posts)
-  const onMarkerClickRef = useRef(onMarkerClick)
   const [mapError, setMapError] = useState<string | null>(null)
-  const [mapReady, setMapReady] = useState(false)
-
-  // refs を最新に保つ
-  postsRef.current = posts
-  onMarkerClickRef.current = onMarkerClick
-
-  const renderMarkers = useCallback(() => {
-    const map = mapInstanceRef.current
-    if (!map) return
-
-    markersRef.current.forEach(m => m.setMap(null))
-    markersRef.current = []
-
-    const bounds = map.getBounds()
-    const validPosts = postsRef.current.filter(p => isValidCoord(p.latitude, p.longitude))
-
-    // マップ表示範囲内のイベントのみ描画（初期は最大50件）
-    const toShow = bounds
-      ? validPosts.filter(p => bounds.contains({ lat: p.latitude, lng: p.longitude }))
-      : validPosts.slice(0, 50)
-
-    toShow.forEach(post => {
-      const color = CATEGORY_COLORS[post.category as keyof typeof CATEGORY_COLORS] ?? '#888888'
-
-      const marker = new google.maps.Marker({
-        position: { lat: post.latitude, lng: post.longitude },
-        map,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: color,
-          fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeWeight: 2.5,
-          scale: 10,
-        },
-        title: post.title,
-      })
-
-      marker.addListener('click', () => {
-        onMarkerClickRef.current(post)
-        map.panTo({ lat: post.latitude, lng: post.longitude })
-      })
-
-      markersRef.current.push(marker)
-    })
-  }, [])
 
   const initMap = useCallback(async () => {
     if (!mapRef.current || mapInstanceRef.current) return
@@ -86,13 +39,15 @@ export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps
       return
     }
 
-    const loader = new Loader({
-      apiKey,
-      version: 'quarterly',
-      libraries: [],
-    })
+    if (!loaderInstance) {
+      loaderInstance = new Loader({
+        apiKey,
+        version: 'weekly',
+        libraries: ['places'],
+      })
+    }
 
-    await loader.load()
+    await loaderInstance.load()
 
     const center =
       userLat && userLng && isValidCoord(userLat, userLng)
@@ -113,29 +68,50 @@ export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps
         { featureType: 'transit', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
       ],
     })
-
-    // マップ移動・ズーム後にマーカー更新
-    idleListenerRef.current = mapInstanceRef.current.addListener('idle', renderMarkers)
-
-    setMapReady(true)
-  }, [userLat, userLng, renderMarkers])
+  }, [userLat, userLng])
 
   useEffect(() => {
     initMap().catch(err => {
       console.error('Google Maps load error:', err)
       setMapError('マップの読み込みに失敗しました')
     })
-    return () => {
-      if (idleListenerRef.current) {
-        google.maps.event.removeListener(idleListenerRef.current)
-      }
-    }
   }, [initMap])
 
-  // マップ準備完了後 or posts更新時にマーカーを再描画
+  // マーカー描画（表示範囲内 or 最大100件）
   useEffect(() => {
-    if (mapReady) renderMarkers()
-  }, [mapReady, posts, renderMarkers])
+    if (!mapInstanceRef.current) return
+
+    markersRef.current.forEach(m => m.setMap(null))
+    markersRef.current = []
+
+    const validPosts = posts.filter(p => isValidCoord(p.latitude, p.longitude))
+    const toShow = validPosts.slice(0, 100)
+
+    toShow.forEach(post => {
+      const color = CATEGORY_COLORS[post.category as keyof typeof CATEGORY_COLORS] ?? '#888888'
+
+      const marker = new google.maps.Marker({
+        position: { lat: post.latitude, lng: post.longitude },
+        map: mapInstanceRef.current!,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: color,
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2.5,
+          scale: 10,
+        },
+        title: post.title,
+      })
+
+      marker.addListener('click', () => {
+        onMarkerClick(post)
+        mapInstanceRef.current?.panTo({ lat: post.latitude, lng: post.longitude })
+      })
+
+      markersRef.current.push(marker)
+    })
+  }, [posts, onMarkerClick])
 
   // ユーザー位置マーカー
   const userMarkerRef = useRef<google.maps.Marker | null>(null)
@@ -172,7 +148,7 @@ export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps
         <button
           onClick={() => {
             setMapError(null)
-            setMapReady(false)
+            loaderInstance = null
             mapInstanceRef.current = null
           }}
           className="px-4 py-2 bg-matsuri-red text-white rounded-full text-sm font-semibold"
