@@ -181,6 +181,20 @@ export function PostModal({ post, onClose }: PostModalProps) {
         {/* スクロールコンテンツ */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 space-y-4">
+            {/* 投稿者 */}
+            {post.users && (
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-gray-200 overflow-hidden shrink-0 flex items-center justify-center">
+                  {post.users.avatar_url ? (
+                    <Image src={post.users.avatar_url} alt="" width={28} height={28} className="object-cover" />
+                  ) : (
+                    <span className="text-xs font-bold text-gray-500">{post.users.username?.[0]?.toUpperCase() || 'U'}</span>
+                  )}
+                </div>
+                <span className="text-xs text-gray-500 font-medium">{post.users.username || 'ユーザー'}</span>
+              </div>
+            )}
+
             {/* タイトル & アクション */}
             <div className="flex items-start justify-between gap-2">
               <h2 className="text-xl font-bold text-matsuri-dark leading-tight flex-1">{post.title}</h2>

@@ -85,7 +85,10 @@ export function PostCard({ post, onClick, onLikeUpdate }: PostCardProps) {
 
       {/* コンテンツ */}
       <div className="p-3">
-        <h3 className="font-bold text-matsuri-dark text-sm line-clamp-1 mb-1">{post.title}</h3>
+        <h3 className="font-bold text-matsuri-dark text-sm line-clamp-1 mb-0.5">{post.title}</h3>
+        {post.users?.username && (
+          <p className="text-[10px] text-gray-400 mb-1">by {post.users.username}</p>
+        )}
 
         <div className="flex items-center gap-1 text-gray-500 mb-1">
           <MapPin size={11} className="shrink-0" />

@@ -60,10 +60,13 @@ export function PostForm() {
       category: 'matsuri',
       start_date: new Date().toISOString().split('T')[0],
       end_date: new Date().toISOString().split('T')[0],
+      start_time: '',
+      end_time: '',
     },
   })
 
   const selectedCategory = watch('category')
+  const startDate = watch('start_date')
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -200,7 +203,7 @@ export function PostForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-36 overflow-x-hidden">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-36">
       {/* カテゴリ選択 */}
       <div>
         <label className="block text-sm font-bold text-matsuri-dark mb-2">カテゴリ</label>
@@ -300,7 +303,7 @@ export function PostForm() {
       </div>
 
       {/* 開催日 */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         <div>
           <label className="block text-sm font-bold text-matsuri-dark mb-1.5">開始日 *</label>
           <input
@@ -314,6 +317,7 @@ export function PostForm() {
           <input
             type="date"
             {...register('end_date')}
+            min={startDate}
             className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-matsuri-red/30"
           />
         </div>
@@ -322,18 +326,20 @@ export function PostForm() {
       {/* 開催時間 */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-bold text-matsuri-dark mb-1.5">開始時間</label>
+          <label className="block text-sm font-bold text-matsuri-dark mb-1.5">開始時間（任意）</label>
           <input
             type="time"
             {...register('start_time')}
+            placeholder="--:--"
             className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-matsuri-red/30"
           />
         </div>
         <div>
-          <label className="block text-sm font-bold text-matsuri-dark mb-1.5">終了時間</label>
+          <label className="block text-sm font-bold text-matsuri-dark mb-1.5">終了時間（任意）</label>
           <input
             type="time"
             {...register('end_time')}
+            placeholder="--:--"
             className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-matsuri-red/30"
           />
         </div>
