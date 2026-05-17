@@ -92,7 +92,7 @@ export default function HomePage() {
                   {loading ? '読み込み中...' : `${posts.length}件のイベント`}
                 </div>
               </button>
-              <div className="overflow-y-auto p-3 grid grid-cols-2 gap-3" style={{ maxHeight: 'calc(60vh - 72px)' }}>
+              <div className="overflow-y-auto p-3 pb-24 grid grid-cols-2 gap-3" style={{ maxHeight: 'calc(60vh - 72px)' }}>
                 {posts.map(post => (
                   <PostCard key={post.id} post={post} onClick={() => setSelectedPost(post)} />
                 ))}
@@ -108,7 +108,7 @@ export default function HomePage() {
                 onLocateMe={handleLocateMe}
                 rightSlot={toggleButton}
               />
-              <div className="h-[104px]" />
+              <div className="h-[136px]" />
             </div>
             <div className="flex-1 overflow-y-auto p-3">
               {loading ? (

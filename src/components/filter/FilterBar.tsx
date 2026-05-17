@@ -40,12 +40,8 @@ export function FilterBar({ filters, onChange, onLocateMe, rightSlot }: FilterBa
     onChange({ ...filters, categories: next })
   }
 
-  const setPeriod = (period: FilterPeriod) => {
-    onChange({ ...filters, period })
-  }
-
   return (
-    <div className="absolute top-2 left-0 right-0 z-10 px-3 space-y-2">
+    <div className="absolute top-2 left-0 right-0 z-10 px-3 space-y-1.5">
       {/* 検索バー + 右スロット */}
       <div className="flex items-center gap-2">
         <div className="flex-1 glass-effect rounded-2xl shadow-md flex items-center gap-2 px-3 py-2.5">
@@ -69,12 +65,12 @@ export function FilterBar({ filters, onChange, onLocateMe, rightSlot }: FilterBa
         {rightSlot}
       </div>
 
-      {/* 期間フィルター + カテゴリフィルター */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      {/* 期間フィルター */}
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
         {periods.map(p => (
           <button
             key={p.value}
-            onClick={() => setPeriod(p.value)}
+            onClick={() => onChange({ ...filters, period: p.value })}
             className={cn(
               'px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border shadow-sm',
               filters.period === p.value
@@ -85,9 +81,21 @@ export function FilterBar({ filters, onChange, onLocateMe, rightSlot }: FilterBa
             {p.label}
           </button>
         ))}
+      </div>
 
-        <div className="w-px bg-gray-200 mx-1 self-stretch" />
-
+      {/* カテゴリフィルター */}
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+        <button
+          onClick={() => onChange({ ...filters, categories: [] })}
+          className={cn(
+            'px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border shadow-sm',
+            filters.categories.length === 0
+              ? 'bg-matsuri-dark text-white border-matsuri-dark'
+              : 'bg-white text-gray-600 border-gray-200'
+          )}
+        >
+          すべて
+        </button>
         {categories.map(cat => (
           <button
             key={cat}

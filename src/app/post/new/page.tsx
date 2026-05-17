@@ -51,7 +51,7 @@ export default function NewPostPage() {
       </header>
 
       {/* フォーム */}
-      <div className="flex-1 overflow-y-auto p-4" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-4" style={{ paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
         <PostForm />
       </div>
 
