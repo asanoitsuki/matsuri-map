@@ -10,7 +10,7 @@ import { Post, FilterState, Category, CATEGORY_LABELS } from '@/types'
 import { useDebounce } from '@/hooks/useDebounce'
 
 const defaultFilters: FilterState = {
-  period: 'all',
+  period: 'upcoming',
   categories: [],
   nearMe: false,
   searchQuery: '',

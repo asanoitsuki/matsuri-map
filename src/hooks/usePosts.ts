@@ -67,8 +67,6 @@ export function usePosts(
         filtered = filtered.filter((p: Post) => isEventWithinDays(p.start_date, p.end_date, 30))
       } else if (filters.period === '3months') {
         filtered = filtered.filter((p: Post) => isEventWithinDays(p.start_date, p.end_date, 90))
-      } else if (filters.period === '6months') {
-        filtered = filtered.filter((p: Post) => isEventWithinDays(p.start_date, p.end_date, 180))
       } else if (filters.period === 'past') {
         filtered = filtered.filter((p: Post) => isEventPast(p.start_date, p.end_date))
       }

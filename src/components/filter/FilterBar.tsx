@@ -17,8 +17,6 @@ const periods: { value: FilterPeriod; label: string }[] = [
   { value: 'week', label: '1週間以内' },
   { value: 'month', label: '1か月以内' },
   { value: '3months', label: '3か月以内' },
-  { value: '6months', label: '半年以内' },
-  { value: 'all', label: 'すべて' },
   { value: 'past', label: '終了済み' },
 ]
 
@@ -41,38 +39,38 @@ export function FilterBar({ filters, onChange, onLocateMe, rightSlot }: FilterBa
   }
 
   return (
-    <div className="absolute top-2 left-0 right-0 z-10 px-3 space-y-1.5">
+    <div className="absolute top-2 left-0 right-0 z-10 px-3 space-y-1">
       {/* 検索バー + 右スロット */}
       <div className="flex items-center gap-2">
-        <div className="flex-1 glass-effect rounded-2xl shadow-md flex items-center gap-2 px-3 py-2.5">
+        <div className="flex-1 min-w-0 glass-effect rounded-xl shadow-md flex items-center gap-2 px-3 py-2">
           <input
             type="search"
             placeholder="祭り・場所を検索..."
             value={filters.searchQuery}
             onChange={e => onChange({ ...filters, searchQuery: e.target.value })}
-            className="flex-1 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
+            className="flex-1 min-w-0 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
           />
           <button
             onClick={onLocateMe}
             className={cn(
-              'p-1.5 rounded-xl transition-colors shrink-0',
+              'p-1 rounded-lg transition-colors shrink-0',
               filters.nearMe ? 'bg-matsuri-red text-white' : 'bg-gray-100 text-gray-500'
             )}
           >
-            <Locate size={15} />
+            <Locate size={14} />
           </button>
         </div>
         {rightSlot}
       </div>
 
       {/* 期間フィルター */}
-      <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
         {periods.map(p => (
           <button
             key={p.value}
             onClick={() => onChange({ ...filters, period: p.value })}
             className={cn(
-              'px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border shadow-sm',
+              'px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all border shadow-sm',
               filters.period === p.value
                 ? 'bg-matsuri-dark text-white border-matsuri-dark'
                 : 'bg-white text-gray-600 border-gray-200'
@@ -88,7 +86,7 @@ export function FilterBar({ filters, onChange, onLocateMe, rightSlot }: FilterBa
         <button
           onClick={() => onChange({ ...filters, categories: [] })}
           className={cn(
-            'px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border shadow-sm',
+            'px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all border shadow-sm',
             filters.categories.length === 0
               ? 'bg-matsuri-dark text-white border-matsuri-dark'
               : 'bg-white text-gray-600 border-gray-200'
@@ -101,7 +99,7 @@ export function FilterBar({ filters, onChange, onLocateMe, rightSlot }: FilterBa
             key={cat}
             onClick={() => toggleCategory(cat)}
             className={cn(
-              'px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border shadow-sm',
+              'px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all border shadow-sm',
               filters.categories.includes(cat)
                 ? categoryColors[cat]
                 : 'bg-white text-gray-600 border-gray-200'

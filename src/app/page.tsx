@@ -79,17 +79,18 @@ export default function HomePage() {
               rightSlot={toggleButton}
             />
 
-            {/* スライドアップパネル */}
+            {/* スライドアップパネル - BottomNavの上に配置 */}
             <div
-              className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-lg transition-transform duration-300"
+              className="absolute left-0 right-0 bg-white rounded-t-3xl shadow-lg transition-transform duration-300"
               style={{
-                maxHeight: '60%',
-                transform: showList ? 'translateY(0)' : 'translateY(calc(100% - 72px))',
+                bottom: 'calc(4.5rem + 0.5rem)', // BottomNav(h-16=4rem) + bottom-2(0.5rem) + 少し余裕
+                maxHeight: '56%',
+                transform: showList ? 'translateY(0)' : 'translateY(calc(100% - 60px))',
               }}
             >
               <button
                 onClick={() => setShowList(v => !v)}
-                className="w-full flex flex-col items-center py-3 border-b border-gray-100"
+                className="w-full flex flex-col items-center py-2.5 border-b border-gray-100"
               >
                 <div className="w-10 h-1 bg-gray-300 rounded-full mb-2" />
                 <div className="flex items-center gap-2 text-sm font-semibold text-matsuri-dark">
@@ -97,7 +98,7 @@ export default function HomePage() {
                   {loading ? '読み込み中...' : `${posts.length}件のイベント`}
                 </div>
               </button>
-              <div className="overflow-y-auto p-3 pb-24 grid grid-cols-2 gap-3" style={{ maxHeight: 'calc(60vh - 72px)' }}>
+              <div className="overflow-y-auto p-3 grid grid-cols-2 gap-3" style={{ maxHeight: 'calc(56vh - 60px)' }}>
                 {posts.map(post => (
                   <PostCard key={post.id} post={post} onClick={() => setSelectedPost(post)} />
                 ))}
@@ -113,9 +114,9 @@ export default function HomePage() {
                 onLocateMe={handleLocateMe}
                 rightSlot={toggleButton}
               />
-              <div className="h-[136px]" />
+              <div className="h-[118px]" />
             </div>
-            <div className="flex-1 overflow-y-auto p-3">
+            <div className="flex-1 overflow-y-auto p-3" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
               {loading ? (
                 <div className="flex items-center justify-center h-32">
                   <div className="w-8 h-8 border-2 border-matsuri-red border-t-transparent rounded-full animate-spin" />
