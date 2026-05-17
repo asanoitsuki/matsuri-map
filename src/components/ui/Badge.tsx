@@ -9,9 +9,11 @@ interface BadgeProps {
 
 export function CategoryBadge({ category, size = 'sm' }: BadgeProps) {
   const sizeClass = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm'
+  const bg = CATEGORY_BG[category as keyof typeof CATEGORY_BG] ?? 'bg-gray-400'
+  const label = CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS] ?? category
   return (
-    <span className={`inline-flex items-center rounded-full font-semibold text-white ${CATEGORY_BG[category]} ${sizeClass}`}>
-      {CATEGORY_LABELS[category]}
+    <span className={`inline-flex items-center rounded-full font-semibold text-white ${bg} ${sizeClass}`}>
+      {label}
     </span>
   )
 }

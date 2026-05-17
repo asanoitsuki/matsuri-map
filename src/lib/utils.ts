@@ -56,7 +56,7 @@ export function isEventPast(startDate: string, endDate: string): boolean {
 }
 
 export function getCategoryMarkerColor(category: Category): string {
-  return CATEGORY_COLORS[category]
+  return CATEGORY_COLORS[category as keyof typeof CATEGORY_COLORS] ?? '#888888'
 }
 
 export function getDistanceKm(

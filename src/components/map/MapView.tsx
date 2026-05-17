@@ -72,7 +72,7 @@ export function MapView({ posts, onMarkerClick, userLat, userLng }: MapViewProps
     markersRef.current = []
 
     posts.forEach(post => {
-      const color = CATEGORY_COLORS[post.category]
+      const color = CATEGORY_COLORS[post.category as keyof typeof CATEGORY_COLORS] ?? '#888888'
 
       const markerIcon = {
         path: google.maps.SymbolPath.CIRCLE,
