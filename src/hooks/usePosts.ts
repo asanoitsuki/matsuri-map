@@ -5,13 +5,22 @@ import { createClient } from '@/lib/supabase/client'
 import { Post, FilterState } from '@/types'
 import { isEventToday, isEventThisWeek, getDistanceKm } from '@/lib/utils'
 
-export function usePosts(filters: FilterState, userLat?: number | null, userLng?: number | null) {
+export function usePosts(
+  filters: FilterState,
+  userLat?: number | null,
+  userLng?: number | null,
+  skip?: boolean
+) {
   const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!skip)
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
   const fetchPosts = useCallback(async () => {
+    if (skip) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
     setError(null)
 
@@ -28,6 +37,7 @@ export function usePosts(filters: FilterState, userLat?: number | null, userLng?
         `)
         .eq('is_approved', true)
         .order('created_at', { ascending: false })
+        .limit(200)
 
       if (filters.categories.length > 0) {
         query = query.in('category', filters.categories)
@@ -66,15 +76,10 @@ export function usePosts(filters: FilterState, userLat?: number | null, userLng?
       }
 
       if (user) {
-        const { data: likes } = await supabase
-          .from('likes')
-          .select('post_id')
-          .eq('user_id', user.id)
-
-        const { data: saves } = await supabase
-          .from('saves')
-          .select('post_id')
-          .eq('user_id', user.id)
+        const [{ data: likes }, { data: saves }] = await Promise.all([
+          supabase.from('likes').select('post_id').eq('user_id', user.id),
+          supabase.from('saves').select('post_id').eq('user_id', user.id),
+        ])
 
         const likedIds = new Set((likes || []).map((l: any) => l.post_id))
         const savedIds = new Set((saves || []).map((s: any) => s.post_id))
@@ -89,10 +94,11 @@ export function usePosts(filters: FilterState, userLat?: number | null, userLng?
       setPosts(filtered)
     } catch (err: any) {
       setError(err.message || '投稿の取得に失敗しました')
+      setPosts([])
     } finally {
       setLoading(false)
     }
-  }, [filters, userLat, userLng])
+  }, [filters, userLat, userLng, skip])
 
   useEffect(() => {
     fetchPosts()

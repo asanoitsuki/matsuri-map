@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { MapView } from '@/components/map/MapView'
+import dynamic from 'next/dynamic'
 import { FilterBar } from '@/components/filter/FilterBar'
 import { PostModal } from '@/components/post/PostModal'
 import { PostCard } from '@/components/post/PostCard'
@@ -11,6 +11,11 @@ import { usePosts } from '@/hooks/usePosts'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { Post, FilterState } from '@/types'
 import { ChevronUp, List, Map } from 'lucide-react'
+
+const MapView = dynamic(
+  () => import('@/components/map/MapView').then(m => m.MapView),
+  { ssr: false, loading: () => <div className="w-full h-full bg-gray-100 animate-pulse" /> }
+)
 
 const defaultFilters: FilterState = {
   period: 'all',
@@ -32,94 +37,72 @@ export default function HomePage() {
     setFilters(f => ({ ...f, nearMe: !f.nearMe }))
   }, [getCurrentPosition])
 
+  const handleMarkerClick = useCallback((post: Post) => {
+    setSelectedPost(post)
+    setShowList(false)
+  }, [])
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
       <Header />
 
       <div className="flex-1 relative overflow-hidden">
-        {/* 地図 / リスト切替 */}
-        <div className="absolute top-0 right-3 z-20 flex items-center mt-16 gap-2">
+        <div className="absolute top-2 right-3 z-20 mt-16">
           <button
             onClick={() => setViewMode(v => v === 'map' ? 'list' : 'map')}
             className="glass-effect shadow-md px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-semibold text-matsuri-dark"
           >
-            {viewMode === 'map' ? (
-              <><List size={14} /> リスト</>
-            ) : (
-              <><Map size={14} /> 地図</>
-            )}
+            {viewMode === 'map' ? <><List size={14} />リスト</> : <><Map size={14} />地図</>}
           </button>
         </div>
 
         {viewMode === 'map' ? (
           <>
-            {/* 地図 */}
             <div className="absolute inset-0">
               <MapView
                 posts={posts}
-                onMarkerClick={(post) => {
-                  setSelectedPost(post)
-                  setShowList(false)
-                }}
+                onMarkerClick={handleMarkerClick}
                 userLat={latitude}
                 userLng={longitude}
               />
             </div>
 
-            {/* フィルターバー */}
             <FilterBar
               filters={filters}
               onChange={setFilters}
               onLocateMe={handleLocateMe}
             />
 
-            {/* 下部スライドアップパネル */}
+            {/* スライドアップパネル */}
             <div
-              className={`
-                absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl transition-transform duration-300
-                ${showList ? 'translate-y-0' : 'translate-y-[calc(100%-72px)]'}
-              `}
-              style={{ maxHeight: '60%' }}
+              className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl transition-transform duration-300 shadow-lg`}
+              style={{
+                maxHeight: '60%',
+                transform: showList ? 'translateY(0)' : 'translateY(calc(100% - 72px))',
+              }}
             >
-              {/* ハンドル */}
               <button
                 onClick={() => setShowList(v => !v)}
                 className="w-full flex flex-col items-center py-3 border-b border-gray-100"
               >
                 <div className="w-10 h-1 bg-gray-300 rounded-full mb-2" />
                 <div className="flex items-center gap-2 text-sm font-semibold text-matsuri-dark">
-                  <ChevronUp
-                    size={16}
-                    className={`transition-transform ${showList ? 'rotate-180' : ''}`}
-                  />
-                  <span>
-                    {loading ? '読み込み中...' : `${posts.length}件のイベント`}
-                  </span>
+                  <ChevronUp size={16} className={`transition-transform ${showList ? 'rotate-180' : ''}`} />
+                  {loading ? '読み込み中...' : `${posts.length}件のイベント`}
                 </div>
               </button>
-
-              {/* カードリスト */}
-              <div className="overflow-y-auto h-full p-3 grid grid-cols-2 gap-3">
+              <div className="overflow-y-auto p-3 grid grid-cols-2 gap-3" style={{ maxHeight: 'calc(60vh - 72px)' }}>
                 {posts.map(post => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onClick={() => setSelectedPost(post)}
-                  />
+                  <PostCard key={post.id} post={post} onClick={() => setSelectedPost(post)} />
                 ))}
               </div>
             </div>
           </>
         ) : (
-          /* リストビュー */
           <div className="h-full flex flex-col">
-            <div className="p-3 border-b border-gray-100 bg-white relative">
-              <FilterBar
-                filters={filters}
-                onChange={setFilters}
-                onLocateMe={handleLocateMe}
-              />
-              <div className="h-24" />
+            <div className="relative bg-white border-b border-gray-100">
+              <FilterBar filters={filters} onChange={setFilters} onLocateMe={handleLocateMe} />
+              <div className="h-28" />
             </div>
             <div className="flex-1 overflow-y-auto p-3">
               {loading ? (
@@ -134,11 +117,7 @@ export default function HomePage() {
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   {posts.map(post => (
-                    <PostCard
-                      key={post.id}
-                      post={post}
-                      onClick={() => setSelectedPost(post)}
-                    />
+                    <PostCard key={post.id} post={post} onClick={() => setSelectedPost(post)} />
                   ))}
                 </div>
               )}
@@ -148,8 +127,6 @@ export default function HomePage() {
       </div>
 
       <BottomNav />
-
-      {/* 投稿詳細モーダル */}
       <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />
     </div>
   )
