@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 const schema = z.object({
   title: z.string().min(1, 'イベント名は必須です').max(100, '100文字以内で入力してください'),
   description: z.string().min(1, '説明は必須です').max(2000, '2000文字以内で入力してください'),
-  category: z.enum(['matsuri', 'yatai', 'event', 'kitchen_car'] as const),
+  category: z.enum(['matsuri', 'yatai', 'event', 'hanabi'] as const),
   location_name: z.string().min(1, '場所名は必須です'),
   latitude: z.number({ required_error: '住所を検索してください' }),
   longitude: z.number({ required_error: '住所を検索してください' }),
@@ -32,8 +32,8 @@ type FormData = z.infer<typeof schema>
 const categories: { value: Category; label: string; color: string }[] = [
   { value: 'matsuri', label: '祭り', color: 'bg-red-500' },
   { value: 'yatai', label: '屋台', color: 'bg-orange-400' },
+  { value: 'hanabi', label: '花火', color: 'bg-violet-500' },
   { value: 'event', label: 'イベント', color: 'bg-blue-500' },
-  { value: 'kitchen_car', label: 'キッチンカー', color: 'bg-green-600' },
 ]
 
 export function PostForm() {

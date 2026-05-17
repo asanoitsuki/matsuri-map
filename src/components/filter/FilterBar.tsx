@@ -20,13 +20,13 @@ const periods: { value: FilterPeriod; label: string }[] = [
   { value: 'past', label: '終了済み' },
 ]
 
-const categories: Category[] = ['matsuri', 'yatai', 'event', 'kitchen_car']
+const categories: Category[] = ['matsuri', 'yatai', 'hanabi', 'event']
 
 const categoryColors: Record<Category, string> = {
   matsuri: 'bg-red-500 text-white border-red-500',
   yatai: 'bg-orange-400 text-white border-orange-400',
+  hanabi: 'bg-violet-500 text-white border-violet-500',
   event: 'bg-blue-500 text-white border-blue-500',
-  kitchen_car: 'bg-green-600 text-white border-green-600',
 }
 
 export function FilterBar({ filters, onChange, onLocateMe, rightSlot }: FilterBarProps) {

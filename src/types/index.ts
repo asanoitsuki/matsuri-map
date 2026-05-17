@@ -1,24 +1,24 @@
-export type Category = 'matsuri' | 'yatai' | 'event' | 'kitchen_car'
+export type Category = 'matsuri' | 'yatai' | 'hanabi' | 'event'
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   matsuri: '祭り',
   yatai: '屋台',
+  hanabi: '花火',
   event: 'イベント',
-  kitchen_car: 'キッチンカー',
 }
 
 export const CATEGORY_COLORS: Record<Category, string> = {
   matsuri: '#E63946',
   yatai: '#F4A261',
+  hanabi: '#8B5CF6',
   event: '#457B9D',
-  kitchen_car: '#2D9B5E',
 }
 
 export const CATEGORY_BG: Record<Category, string> = {
   matsuri: 'bg-red-500',
   yatai: 'bg-orange-400',
+  hanabi: 'bg-violet-500',
   event: 'bg-blue-500',
-  kitchen_car: 'bg-green-600',
 }
 
 export interface User {

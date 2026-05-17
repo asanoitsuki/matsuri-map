@@ -16,13 +16,13 @@ const defaultFilters: FilterState = {
   searchQuery: '',
 }
 
-const categories: Category[] = ['matsuri', 'yatai', 'event', 'kitchen_car']
+const categories: Category[] = ['matsuri', 'yatai', 'hanabi', 'event']
 
 const categoryColors: Record<Category, string> = {
   matsuri: 'bg-red-500 text-white',
   yatai: 'bg-orange-400 text-white',
+  hanabi: 'bg-violet-500 text-white',
   event: 'bg-blue-500 text-white',
-  kitchen_car: 'bg-green-600 text-white',
 }
 
 export default function SearchPage() {
