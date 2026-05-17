@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Post, FilterState } from '@/types'
-import { isEventToday, isEventThisWeek, getDistanceKm } from '@/lib/utils'
+import { isEventUpcoming, isEventWithinDays, isEventPast, getDistanceKm } from '@/lib/utils'
 
 export function usePosts(
   filters: FilterState,
@@ -59,10 +59,18 @@ export function usePosts(
         comments_count: post.comments_count?.[0]?.count ?? 0,
       }))
 
-      if (filters.period === 'today') {
-        filtered = filtered.filter((p: Post) => isEventToday(p.start_date, p.end_date))
+      if (filters.period === 'upcoming') {
+        filtered = filtered.filter((p: Post) => isEventUpcoming(p.start_date, p.end_date))
       } else if (filters.period === 'week') {
-        filtered = filtered.filter((p: Post) => isEventThisWeek(p.start_date, p.end_date))
+        filtered = filtered.filter((p: Post) => isEventWithinDays(p.start_date, p.end_date, 7))
+      } else if (filters.period === 'month') {
+        filtered = filtered.filter((p: Post) => isEventWithinDays(p.start_date, p.end_date, 30))
+      } else if (filters.period === '3months') {
+        filtered = filtered.filter((p: Post) => isEventWithinDays(p.start_date, p.end_date, 90))
+      } else if (filters.period === '6months') {
+        filtered = filtered.filter((p: Post) => isEventWithinDays(p.start_date, p.end_date, 180))
+      } else if (filters.period === 'past') {
+        filtered = filtered.filter((p: Post) => isEventPast(p.start_date, p.end_date))
       }
 
       if (filters.nearMe && userLat != null && userLng != null) {

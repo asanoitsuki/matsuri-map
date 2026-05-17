@@ -18,7 +18,7 @@ const MapView = dynamic(
 )
 
 const defaultFilters: FilterState = {
-  period: 'all',
+  period: 'upcoming',
   categories: [],
   nearMe: false,
   searchQuery: '',
@@ -42,20 +42,20 @@ export default function HomePage() {
     setShowList(false)
   }, [])
 
+  const toggleButton = (
+    <button
+      onClick={() => setViewMode(v => v === 'map' ? 'list' : 'map')}
+      className="glass-effect shadow-md px-3 py-2.5 rounded-2xl flex items-center gap-1.5 text-xs font-semibold text-matsuri-dark whitespace-nowrap shrink-0"
+    >
+      {viewMode === 'map' ? <><List size={14} />リスト</> : <><Map size={14} />地図</>}
+    </button>
+  )
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
       <Header />
 
       <div className="flex-1 relative overflow-hidden">
-        <div className="absolute top-2 right-3 z-20 mt-16">
-          <button
-            onClick={() => setViewMode(v => v === 'map' ? 'list' : 'map')}
-            className="glass-effect shadow-md px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-semibold text-matsuri-dark"
-          >
-            {viewMode === 'map' ? <><List size={14} />リスト</> : <><Map size={14} />地図</>}
-          </button>
-        </div>
-
         {viewMode === 'map' ? (
           <>
             <div className="absolute inset-0">
@@ -71,11 +71,12 @@ export default function HomePage() {
               filters={filters}
               onChange={setFilters}
               onLocateMe={handleLocateMe}
+              rightSlot={toggleButton}
             />
 
             {/* スライドアップパネル */}
             <div
-              className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl transition-transform duration-300 shadow-lg`}
+              className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-lg transition-transform duration-300"
               style={{
                 maxHeight: '60%',
                 transform: showList ? 'translateY(0)' : 'translateY(calc(100% - 72px))',
@@ -100,9 +101,14 @@ export default function HomePage() {
           </>
         ) : (
           <div className="h-full flex flex-col">
-            <div className="relative bg-white border-b border-gray-100">
-              <FilterBar filters={filters} onChange={setFilters} onLocateMe={handleLocateMe} />
-              <div className="h-28" />
+            <div className="bg-white border-b border-gray-100 relative">
+              <FilterBar
+                filters={filters}
+                onChange={setFilters}
+                onLocateMe={handleLocateMe}
+                rightSlot={toggleButton}
+              />
+              <div className="h-[104px]" />
             </div>
             <div className="flex-1 overflow-y-auto p-3">
               {loading ? (

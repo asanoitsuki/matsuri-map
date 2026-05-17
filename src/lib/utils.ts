@@ -31,6 +31,30 @@ export function isEventThisWeek(startDate: string, endDate: string): boolean {
   return start <= nextWeek && end >= today
 }
 
+export function isEventUpcoming(startDate: string, endDate: string): boolean {
+  const end = parseISO(endDate)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return end >= today
+}
+
+export function isEventWithinDays(startDate: string, endDate: string, days: number): boolean {
+  const start = parseISO(startDate)
+  const end = parseISO(endDate)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const future = new Date(today)
+  future.setDate(today.getDate() + days)
+  return start <= future && end >= today
+}
+
+export function isEventPast(startDate: string, endDate: string): boolean {
+  const end = parseISO(endDate)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return end < today
+}
+
 export function getCategoryMarkerColor(category: Category): string {
   return CATEGORY_COLORS[category]
 }

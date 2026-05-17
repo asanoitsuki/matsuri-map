@@ -103,21 +103,30 @@ export function PostForm() {
     )
   }
 
-  const uploadImages = async (postId: string): Promise<string[]> => {
-    const urls: string[] = []
-    for (const file of images) {
-      const ext = file.name.split('.').pop()
-      const path = `posts/${postId}/${Date.now()}.${ext}`
-      const { error } = await supabase.storage.from('post-images').upload(path, file, {
+  const uploadOneImage = async (postId: string, file: File): Promise<string | null> => {
+    const ext = file.name.split('.').pop() || 'jpg'
+    const path = `posts/${postId}/${Date.now()}.${ext}`
+    try {
+      const uploadPromise = supabase.storage.from('post-images').upload(path, file, {
         cacheControl: '3600',
         upsert: false,
       })
-      if (!error) {
-        const { data: { publicUrl } } = supabase.storage.from('post-images').getPublicUrl(path)
-        urls.push(publicUrl)
-      }
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), 15000)
+      )
+      const { error } = await Promise.race([uploadPromise, timeoutPromise])
+      if (error) return null
+      const { data: { publicUrl } } = supabase.storage.from('post-images').getPublicUrl(path)
+      return publicUrl
+    } catch {
+      return null
     }
-    return urls
+  }
+
+  const uploadImages = async (postId: string): Promise<string[]> => {
+    if (images.length === 0) return []
+    const results = await Promise.all(images.map(f => uploadOneImage(postId, f)))
+    return results.filter((url): url is string => url !== null)
   }
 
   const onSubmit = async (data: FormData) => {
@@ -128,7 +137,7 @@ export function PostForm() {
       const postId = crypto.randomUUID()
       const imageUrls = await uploadImages(postId)
 
-      const { error } = await supabase.from('posts').insert({
+      const submitPromise = supabase.from('posts').insert({
         id: postId,
         user_id: user.id,
         title: data.title,
@@ -145,14 +154,17 @@ export function PostForm() {
         images: imageUrls,
         is_approved: true,
       })
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('通信がタイムアウトしました')), 20000)
+      )
+      const { error } = await Promise.race([submitPromise, timeoutPromise])
 
       if (error) throw error
 
       toast.success('投稿しました！')
       router.push('/')
     } catch (err: any) {
-      toast.error('投稿に失敗しました: ' + err.message)
-    } finally {
+      toast.error('投稿に失敗しました: ' + (err.message || '不明なエラー'))
       setSubmitting(false)
     }
   }

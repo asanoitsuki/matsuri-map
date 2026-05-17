@@ -87,7 +87,7 @@ export interface Report {
   created_at: string
 }
 
-export type FilterPeriod = 'all' | 'today' | 'week'
+export type FilterPeriod = 'upcoming' | 'week' | 'month' | '3months' | '6months' | 'past' | 'all'
 
 export interface FilterState {
   period: FilterPeriod

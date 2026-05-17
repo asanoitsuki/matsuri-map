@@ -18,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 glass-effect border-t border-gray-100 safe-area-bottom">
-      <div className="flex items-center justify-around h-16 px-2">
+      <div className="grid grid-cols-5 h-16">
         {navItems.map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon
@@ -42,7 +42,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-colors active:bg-gray-100"
+              className="flex flex-col items-center justify-center gap-1 rounded-2xl transition-colors active:bg-gray-100"
             >
               <Icon
                 size={22}
